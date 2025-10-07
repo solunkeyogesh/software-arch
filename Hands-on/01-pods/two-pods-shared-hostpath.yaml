@@ -1,0 +1,59 @@
+apiVersion: v1
+kind: Pod
+metadata:
+  name: writer-a
+  namespace: dev
+  labels: { app: writer }
+spec:
+  nodeSelector:
+    shared-storage: "true"
+  containers:
+  - name: app
+    image: busybox:1.36
+    command: ["sh","-c"]
+    args:
+      - |
+        echo "starting writer-a"; i=0;
+        while true; do
+          line="$(hostname) [writer-a] $(date +%F\ %T) i=$i";
+          echo "$line" | tee -a /data/stream.log;
+          i=$((i+1)); sleep 1;
+        done
+    volumeMounts:
+    - name: shared
+      mountPath: /data
+  volumes:
+  - name: shared
+    hostPath:
+      path: /var/shared/demo
+      type: DirectoryOrCreate
+---
+apiVersion: v1
+kind: Pod
+metadata:
+  name: writer-b
+  namespace: dev
+  labels: { app: writer }
+spec:
+  nodeSelector:
+    shared-storage: "true"
+  containers:
+  - name: app
+    image: busybox:1.36
+    command: ["sh","-c"]
+    args:
+      - |
+        echo "starting writer-b"; i=0;
+        while true; do
+          line="$(hostname) [writer-b] $(date +%F\ %T) i=$i";
+          echo "$line" | tee -a /data/stream.log;
+          i=$((i+1)); sleep 1;
+        done
+    volumeMounts:
+    - name: shared
+      mountPath: /data  
+  volumes:
+  - name: shared
+    hostPath:
+      path: /var/shared/demo
+      type: DirectoryOrCreate

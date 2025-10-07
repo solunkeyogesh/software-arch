@@ -1,0 +1,32 @@
+apiVersion: v1
+kind: PersistentVolume
+metadata:
+  name: mysql-pv
+spec:
+  capacity:
+    storage: 5Gi
+  accessModes: ["ReadWriteOnce"]
+  persistentVolumeReclaimPolicy: Delete
+  storageClassName: manual
+  hostPath:
+    path: /mnt/mysql-data                # directory on the chosen node
+  nodeAffinity:
+    required:
+      nodeSelectorTerms:
+        - matchExpressions:
+            - key: kubernetes.io/hostname
+              operator: In
+              values:
+                - multinode-demo-m02      # <-- pick the node you want
+---
+apiVersion: v1
+kind: PersistentVolumeClaim
+metadata:
+  name: mysql-pvc
+  namespace: dev
+spec:
+  accessModes: ["ReadWriteOnce"]
+  storageClassName: manual
+  resources:
+    requests:
+      storage: 5Gi

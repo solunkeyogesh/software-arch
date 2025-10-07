@@ -1,0 +1,18 @@
+minikube start --nodes=3 -p multinode-demo 
+ 
+ kubectl create -f .\ns-dev.yaml 
+ kubectl delete -f .\ns-dev.yaml
+ kubectl config set-context --current --namespace=dev "or" kubectl config set-context --current --namespace=prod
+ kubectl config get-contexts
+ kubectl get nodes -o wide       
+ kubectl describe pod hello-pod
+
+ kubectl get svc
+
+
+
+ kubectl -n oms get pods -o wide
+
+
+ # kubectl -n dev exec -it mysql-0 -- mysql -h mysql-0.mysql-hl.dev.svc.cluster.local -uroot -padmin
+kubectl -n dev port-forward svc/mysql 3309:3306

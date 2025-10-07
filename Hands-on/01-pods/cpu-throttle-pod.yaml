@@ -1,0 +1,19 @@
+apiVersion: v1
+kind: Pod
+metadata:
+  name: cpu-throttle-pod
+  namespace: dev
+  labels: { app: cpu-throttle }
+spec:
+  containers:
+  - name: worker
+    image: busybox:1.36
+    command: ["sh","-c"]
+    args: ["yes > /dev/null"]   # infinite CPU burn
+    # resources:
+    #   requests:
+    #     cpu: 100m
+    #     memory: 64Mi
+    #   limits:
+    #     cpu: 200m         # <- you'll see usage capped near 200m
+    #     memory: 128Mi

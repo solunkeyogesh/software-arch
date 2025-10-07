@@ -1,0 +1,38 @@
+apiVersion: v1
+kind: Pod
+metadata:
+  name: hello-pod
+  namespace: dev
+  labels:
+    app: nginx-app-pod
+spec:
+  containers:
+  - name: web
+    image: nginx:1.25
+    ports:
+    - containerPort: 80
+    resources:
+      requests:
+        cpu: 100m
+        memory: 128Mi
+      limits:
+        cpu: 200m
+        memory: 256Mi
+    livenessProbe:                    # Liveness probe = “Should I kill and restart this container?”
+      httpGet:
+        path: /
+        port: 80
+      initialDelaySeconds: 10
+      periodSeconds: 10
+      timeoutSeconds: 2
+      failureThreshold: 3
+
+    readinessProbe:                  # Readiness probe = “Can I send traffic to this container right now?”
+      httpGet:
+        path: /
+        port: 80
+      initialDelaySeconds: 5
+      periodSeconds: 10
+      timeoutSeconds: 1
+      successThreshold: 1
+      failureThreshold: 3

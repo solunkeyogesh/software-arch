@@ -1,0 +1,44 @@
+# StorageClass: static (no dynamic provisioning), used just for matching
+apiVersion: storage.k8s.io/v1
+kind: StorageClass
+metadata:
+  name: manual
+provisioner: kubernetes.io/no-provisioner
+volumeBindingMode: WaitForFirstConsumer
+reclaimPolicy: Delete
+---
+# PersistentVolume pinned to a specific node, using hostPath
+apiVersion: v1
+kind: PersistentVolume
+metadata:
+  name: mysql-pv
+spec:
+  capacity:
+    storage: 5Gi
+  accessModes: ["ReadWriteOnce"]
+  persistentVolumeReclaimPolicy: Delete
+  storageClassName: manual
+  hostPath:
+    path: /mnt/mysql-data
+    type: DirectoryOrCreate   # auto-create the directory if missing
+  nodeAffinity:
+    required:
+      nodeSelectorTerms:
+        - matchExpressions:
+            - key: kubernetes.io/hostname
+              operator: In
+              values:
+                - multinode-demo-m02
+---
+# PVC that matches the PV via storageClassName: manual
+apiVersion: v1
+kind: PersistentVolumeClaim
+metadata:
+  name: mysql-pvc
+  namespace: dev
+spec:
+  accessModes: ["ReadWriteOnce"]
+  storageClassName: manual
+  resources:
+    requests:
+      storage: 5Gi

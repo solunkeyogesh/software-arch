@@ -1,0 +1,4 @@
+
+# Below command to create multinode cluster using minikube
+
+minikube start --nodes=3 -p multinode-demo

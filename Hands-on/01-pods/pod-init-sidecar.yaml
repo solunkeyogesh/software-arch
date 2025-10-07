@@ -1,0 +1,21 @@
+apiVersion: v1
+kind: Pod
+metadata:
+  name: init-sidecar-pod
+  namespace: dev
+spec:
+  initContainers:
+  - name: init-job
+    image: busybox
+    command: ["sh","-c","echo 'warming cache' && sleep 3 && mkdir -p /work && echo ready > /work/flag"]
+    volumeMounts: [{name: work, mountPath: /work}]
+  containers:
+  - name: main-app
+    image: nginx:1.25
+    volumeMounts: [{name: work, mountPath: /usr/share/nginx/html}]
+  - name: log-sidecar
+    image: busybox
+    command: ["sh","-c","tail -n+1 -F /var/log/messages"]
+  volumes:
+  - name: work
+    emptyDir: {}
